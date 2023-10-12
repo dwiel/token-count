@@ -43,7 +43,7 @@ class TokenCount:
                         continue
                     ignore_list.append(line)
 
-        default_ignore_list = ['dist', 'dist/','dist/*','sdist', 'sdist/','sdist/*' '.git/', '/.git/', '.git', '.git/*', '.gptignore', '.gitignore', 'node_modules', 'node_modules/*', '__pycache__', '__pycache__/*']
+        default_ignore_list = ['.obsidian', 'dist', 'dist/','dist/*','sdist', 'sdist/','sdist/*' '.git/', '/.git/', '.git', '.git/*', '.gptignore', '.gitignore', 'node_modules', 'node_modules/*', '__pycache__', '__pycache__/*']
         ignore_list += default_ignore_list
 
         return ignore_list
@@ -59,12 +59,22 @@ class TokenCount:
     def num_tokens_from_file(self, file_path: str) -> int:
         """Returns the number of tokens in a text file."""
         try:
-            with open(file_path, "r") as f:
+            # Ensure you are reading a text file
+            _, file_extension = os.path.splitext(file_path)
+            if file_extension.lower() not in ['.txt', '.md', '.csv', '.json', '.xml']:  # Adjust as per your requirements
+                print(f"Ignoring non-text file {file_path}.")
+                return 0  # Ignoring non-text file
+
+            # Handle encoding issues while reading file
+            with open(file_path, "r", encoding='utf-8', errors='ignore') as f:  # Ignores undecodable characters
                 text = f.read()
             num_tokens = len(self.encoding.encode(text))
             return num_tokens
         except Exception as e:
-            logger.error("Error occurred: {}".format(e))
+            logger.error(f"Error occurred while processing {file_path}: {str(e)}")
+            print(f"Could not read file {file_path}. Ignoring.")
+            return 0
+
 
     def num_tokens_from_directory(self, dir_path: str, ignore_gitignore=True) -> int:
         """Recursively counts the total token count of all files in a directory"""
