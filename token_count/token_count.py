@@ -3,6 +3,7 @@ import tiktoken
 import os
 import logging
 import fnmatch
+import sys
 
 # Create a logger
 logger = logging.getLogger()
@@ -98,17 +99,18 @@ class TokenCount:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Count the number of tokens in a text string or file, similar to the Unix 'wc' utility.")
+        description="Count the number of tokens in a text string, file, directory, or stdin, similar to the Unix 'wc' utility.")
     parser.add_argument("-m", "--model_name", type=str, help="model name", default="gpt-3.5-turbo")
     parser.add_argument("-d", "--directory", type=str, help="directory to count tokens in")
     parser.add_argument("-f", "--file", type=str, help="file to count tokens in")
     parser.add_argument("-t", "--text", type=str, help="text to count tokens in")
+    parser.add_argument("-s", "--stdin", action="store_true", help="read from stdin")
 
     args = parser.parse_args()
 
     token_count = TokenCount(args.model_name)
 
-    if not any([args.directory, args.file, args.text]):
+    if not any([args.directory, args.file, args.text, args.stdin]):
         logger.info("No input provided")
         parser.print_help()
         return
@@ -123,6 +125,11 @@ def main():
 
     if args.text:
         tokens = token_count.num_tokens_from_string(args.text)
+        print(tokens)
+
+    if args.stdin:
+        stdin_text = sys.stdin.read()
+        tokens = token_count.num_tokens_from_string(stdin_text)
         print(tokens)
 
 if __name__ == "__main__":
