@@ -10,6 +10,13 @@ To install Token Count, run the following command in your terminal:
 pip install token-count
 ```
 
+installing from source requires setuptools:
+
+```bash
+pip install setuptools==69.5.1
+pip install .
+```
+
 ## Usage
 
 Token Count has three main options:
